@@ -13,7 +13,11 @@ void ofApp::setup()
 
     box2d.init();
 
+    box2d.setGravity(0, 10);
+  
+
     zombie.setup(box2d);
+    zombie2.setup(box2d);
 
 
 
@@ -59,6 +63,7 @@ void ofApp::update()
     }
 
     zombie.update();
+    zombie2.update();
 
 
 }
@@ -68,13 +73,14 @@ void ofApp::draw()
 {
     ofClear(ofFloatColor(m_grabstrength, 0.0f, 0.0f));
     ofPushMatrix();
-    ofTranslate(m_palmPos.x, m_palmPos.z);
-    ofRotateDeg(m_palmRot.y);
-    ofScale(m_pinchstrength + 0.5f, m_pinchstrength + 0.5f, m_pinchstrength + 0.5f);
-    m_ship.draw(0, 0);
+        ofTranslate(m_palmPos.x, m_palmPos.z);
+        ofRotateDeg(m_palmRot.y);
+        ofScale(m_pinchstrength + 0.5f, m_pinchstrength + 0.5f, m_pinchstrength + 0.5f);
+        m_ship.draw(0, 0);
     ofPopMatrix();
 
     zombie.draw();
+    zombie2.draw();
 
 }
 

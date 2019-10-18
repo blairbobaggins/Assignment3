@@ -37,15 +37,16 @@ void SpawnZombie::update()
     m_ZombiePos.y = Lerp(m_ZombiePos.y, ZombieToEnd.y, 0.003f);
 
     collisionbox.addAttractionPoint(collisionboxpos.x, collisionboxpos.y, 100);
-
+    collisionbox.setPhysics(3.0f, 0.5f, 0.5f);
 }
 void SpawnZombie::draw()
 {
-
-    ofTranslate(m_ZombiePos);
-    ofScale(0.3);
-    collisionbox.draw();
-    m_ZombieImage.draw(0, 0);
+    ofPushMatrix();
+        ofTranslate(m_ZombiePos);
+        ofScale(0.3);
+        collisionbox.draw();
+        m_ZombieImage.draw(0, 0);
+    ofPopMatrix();
 }
 float SpawnZombie::Lerp(float start, float end, float percent)
 {

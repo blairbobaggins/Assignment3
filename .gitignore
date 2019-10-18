@@ -66,3 +66,4 @@ Assignment3.sln
 .vs/Assignment3/v15/Browse.VC.db
 .vs/Assignment3/v15/.suo
 *.ipch
+*.tlog

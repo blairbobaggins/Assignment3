@@ -13,6 +13,7 @@ public:
     void draw();
 
     SpawnZombie zombie;
+    SpawnZombie zombie2;
 
     ofxLeapC::Device            m_device;
     Leap::Frame                 m_frame;

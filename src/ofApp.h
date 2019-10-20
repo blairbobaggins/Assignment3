@@ -15,6 +15,9 @@ public:
     SpawnZombie zombie;
     SpawnZombie zombie2;
 
+	ofxBox2dRect handcollisionbox;
+
+
     ofxLeapC::Device            m_device;
     Leap::Frame                 m_frame;
 

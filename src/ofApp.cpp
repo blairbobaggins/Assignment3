@@ -13,14 +13,17 @@ void ofApp::setup()
 
     box2d.init();
 
-    box2d.setGravity(0, 10);
-  
+    box2d.setGravity(1, 0);
+	box2d.createGround();
+	box2d.setFPS(60.0);
+	box2d.registerGrabbing();
 
     zombie.setup(box2d);
-    zombie2.setup(box2d);
-
-
-
+ 
+	handcollisionbox.setPhysics(3.0, 0.1, 1.5);
+	handcollisionbox.setup(box2d.getWorld(), 400, 500, 91.5f, 152.0f, 0.0f);
+	
+	
 }
 
 //--------------------------------------------------------------
@@ -39,11 +42,13 @@ void ofApp::update()
         const Leap::Hand & hand = hands[i]; //Get out hand (a reference to our hands
         const Leap::Vector palmPos = hand.palmPosition(); //get our palm position
         const ofVec3f ofPalmPos = ofxLeapC::toVec3(palmPos); //convert to OF
+
         m_palmRot = ofVec3f(ofRadToDeg(hand.direction().pitch()), //rotate x
             ofRadToDeg(hand.direction().yaw())), // rotate y
             ofRadToDeg(hand.direction().roll()); // rotate z
         m_palmPos = ofPalmPos;
-        cout << hand.pinchStrength() << endl;
+
+        //cout << hand.pinchStrength() << endl;
         m_pinchstrength = hand.pinchStrength();
         m_grabstrength = hand.grabStrength();
 
@@ -61,9 +66,18 @@ void ofApp::update()
 
         break; // if you only
     }
+	handcollisionbox.setRotation(0);
+	if (m_pinchstrength >= 0.75)
+	{
+		handcollisionbox.setPosition(m_palmPos.x, m_palmPos.z);
+	}
+	else
+	{
+		handcollisionbox.setPosition(-1000,-1000);
+	}
 
     zombie.update();
-    zombie2.update();
+    //zombie2.update();
 
 
 }
@@ -71,16 +85,17 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-    ofClear(ofFloatColor(m_grabstrength, 0.0f, 0.0f));
+   // ofClear(ofFloatColor(m_grabstrength, 0.0f, 0.0f));
     ofPushMatrix();
         ofTranslate(m_palmPos.x, m_palmPos.z);
         ofRotateDeg(m_palmRot.y);
         ofScale(m_pinchstrength + 0.5f, m_pinchstrength + 0.5f, m_pinchstrength + 0.5f);
         m_ship.draw(0, 0);
+		
     ofPopMatrix();
-
+	handcollisionbox.draw();
     zombie.draw();
-    zombie2.draw();
+    //zombie2.draw();
 
 }
 

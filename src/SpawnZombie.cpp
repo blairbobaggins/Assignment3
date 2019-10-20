@@ -13,46 +13,51 @@ void SpawnZombie::setup(const ofxBox2d &worldref)
 {
     m_ZombieImage.loadImage("Images/zombie2.png");
     m_ZombiePos.set(100, ofRandom(100, 500));
-    endpoint.set(2400, m_ZombiePos.y);
+    endpoint.set(1000, m_ZombiePos.y);
 
-    b2Vec2 temppos;
+
 
 
 
     world = worldref;
 
-    temppos = world.toB2d(m_ZombiePos.x, m_ZombiePos.y);
-
-    collisionbox.setup(world.getWorld(), temppos.x, temppos.y, 183.0f, 304.0f, 0.0f);
+    //temppos = world.toB2d(m_ZombiePos.x, m_ZombiePos.y);
+	collisionbox.setPhysics(3.0, 0.1, 1.5);
+    collisionbox.setup(world.getWorld(), 400, 500, 91.5f, 152.0f, 0.0f);
+	
 
 }
 
 void SpawnZombie::update()
 {
-    ofVec2f ZombieToEnd = endpoint - m_ZombiePos;
+    ofVec2f ZombieToEnd = endpoint - collisionbox.getPosition();
 
-    collisionboxpos = world.toB2d(m_ZombiePos.x, m_ZombiePos.y);
+	
 
-    m_ZombiePos.x = Lerp(m_ZombiePos.x, ZombieToEnd.x, 0.003f);
-    m_ZombiePos.y = Lerp(m_ZombiePos.y, ZombieToEnd.y, 0.003f);
+	
+	collisionbox.update();
+	collisionbox.setRotation(0);
+	m_ZombieImage.resize(collisionbox.getWidth(), collisionbox.getHeight());
 
-    collisionbox.addAttractionPoint(collisionboxpos.x, collisionboxpos.y, 100);
-    collisionbox.setPhysics(3.0f, 0.5f, 0.5f);
 }
 void SpawnZombie::draw()
 {
+	collisionbox.draw();
     ofPushMatrix();
-        ofTranslate(m_ZombiePos);
-        ofScale(0.3);
-        collisionbox.draw();
-        m_ZombieImage.draw(0, 0);
+        
+        //ofScale(0.3);
+		//ofRotate(collisionbox.getRotation());
+		ofTranslate(collisionbox.getPosition());
+		m_ZombieImage.draw(0,0);
     ofPopMatrix();
+	//cout << "Temp Pos " << temppos << endl;
+
 }
-float SpawnZombie::Lerp(float start, float end, float percent)
+void SpawnZombie::contactStart(ofxBox2dContactArgs &e)
 {
-    return(start + percent * (end - start));
+
 }
-void SpawnZombie::CollisionDetection(ofxBox2dRect other)
+void SpawnZombie::contactEnd(ofxBox2dContactArgs &e)
 {
 
 }

@@ -15,11 +15,13 @@ void SpawnZombie::setup(const ofxBox2d &worldref)
     m_ZombiePos.set(100, ofRandom(100, 500));
     endpoint.set(1000, m_ZombiePos.y);
 
-
+	//collisionchecker = false;
 
 
 
     world = worldref;
+
+
 
     //temppos = world.toB2d(m_ZombiePos.x, m_ZombiePos.y);
 	collisionbox.setPhysics(3.0, 0.1, 1.5);
@@ -32,13 +34,12 @@ void SpawnZombie::update()
 {
     ofVec2f ZombieToEnd = endpoint - collisionbox.getPosition();
 
-	
 
 	
 	collisionbox.update();
 	collisionbox.setRotation(0);
 	m_ZombieImage.resize(collisionbox.getWidth(), collisionbox.getHeight());
-
+	//cout << collisionbox.getVelocity() << endl;
 }
 void SpawnZombie::draw()
 {
@@ -53,11 +54,8 @@ void SpawnZombie::draw()
 	//cout << "Temp Pos " << temppos << endl;
 
 }
-void SpawnZombie::contactStart(ofxBox2dContactArgs &e)
+void SpawnZombie::FollowPalm(float posx, float posy)
 {
-
-}
-void SpawnZombie::contactEnd(ofxBox2dContactArgs &e)
-{
-
+	collisionbox.setPosition(posx, posy);
+	collisionbox.setVelocity(0, 0);
 }

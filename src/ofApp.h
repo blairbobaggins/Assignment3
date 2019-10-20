@@ -12,8 +12,14 @@ public:
     void update();
     void draw();
 
+	void contactStart(ofxBox2dContactArgs &e);
+	void contactEnd(ofxBox2dContactArgs &e);
+
     SpawnZombie zombie;
     SpawnZombie zombie2;
+
+	bool followpalm;
+	bool letgo;
 
 	ofxBox2dRect handcollisionbox;
 
@@ -22,7 +28,7 @@ public:
     Leap::Frame                 m_frame;
 
     void OnLeapFrame(Leap::Frame frame); // this is where Leap updates all Leap data.
-
+	ofxBox2dJoint				m_joint;
     ofImage                     m_ship;
     ofVec3f                     m_palmPos;
     ofVec3f                     m_palmRot;

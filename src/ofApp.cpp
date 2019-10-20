@@ -10,20 +10,27 @@ void ofApp::setup()
     ofSetWindowShape(ProjectConstants::PROJ_WINDOW_RES_X, ProjectConstants::PROJ_WINDOW_RES_Y);
     //connect "this"'s leapUpdate function to m_device. This refers to this class.
     m_device.connectEventHandler(&ofApp::OnLeapFrame, this);
+	Leap::Hand handcheck;
 
     box2d.init();
-
-    box2d.setGravity(1, 0);
+	box2d.enableEvents();
+    box2d.setGravity(0.1, 0);
 	box2d.createGround();
 	box2d.setFPS(60.0);
 	box2d.registerGrabbing();
 
     zombie.setup(box2d);
  
-	handcollisionbox.setPhysics(3.0, 0.1, 1.5);
+	handcollisionbox.setPhysics(10.0, 0.1, 1.5);
 	handcollisionbox.setup(box2d.getWorld(), 400, 500, 91.5f, 152.0f, 0.0f);
 	
 	
+
+	ofAddListener(box2d.contactStartEvents, this, &ofApp::contactStart);
+	ofAddListener(box2d.contactEndEvents, this, &ofApp::contactEnd);
+	//ofAddListener(handcheck.pinchStrength(), this, ofApp::contactStart);
+	followpalm = false;
+	letgo = false;
 }
 
 //--------------------------------------------------------------
@@ -63,19 +70,39 @@ void ofApp::update()
         m_palmPos.x += (float)ProjectConstants::PROJ_WINDOW_RES_X / 2.0f;
         m_palmPos.z += (float)ProjectConstants::PROJ_WINDOW_RES_Y / 2.0f;
 
-
+		//cout << hand.palmVelocity() << endl;
+		if (followpalm)
+		{
+			
+			//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
+			//zombie.world.grabShapeDown(m_palmPos.x, m_palmPos.z, 1);
+			
+		}
+		else if (letgo)
+		{
+			//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
+			
+			//zombie.world.grabShapeDragged(hand.palmVelocity().x, hand.palmVelocity().z, 1);
+			//zombie.world.grabShapeUp(hand.palmVelocity().x, hand.palmVelocity().z, 1);
+			//handcollisionbox.setVelocity(0,0);
+			//zombie.collisionbox.setVelocity(hand.palmVelocity());
+		}
         break; // if you only
     }
 	handcollisionbox.setRotation(0);
 	if (m_pinchstrength >= 0.75)
 	{
 		handcollisionbox.setPosition(m_palmPos.x, m_palmPos.z);
+		//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
+		
 	}
 	else
 	{
 		handcollisionbox.setPosition(-1000,-1000);
 	}
 
+	
+	cout << handcollisionbox.getVelocity() << endl;
     zombie.update();
     //zombie2.update();
 
@@ -103,4 +130,29 @@ void ofApp::OnLeapFrame(Leap::Frame frame)
 {
     m_frame = frame;
 }
-
+void ofApp::contactStart(ofxBox2dContactArgs &e)
+{
+	if (e.a != NULL && e.b != NULL)
+	{
+		if (e.a->GetType() == b2Shape::e_polygon && e.b->GetType() == b2Shape::e_polygon &&
+			m_pinchstrength >= 0.75)
+		{
+			followpalm = true;
+			letgo = false;
+			//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
+			//collisionbox.destroy();
+		}
+	}
+}
+void ofApp::contactEnd(ofxBox2dContactArgs &e)
+{
+	if (e.a != NULL && e.b != NULL)
+	{
+		if (followpalm && !letgo)
+		{
+			followpalm = false;
+			letgo = true;
+		}
+		
+	}
+}

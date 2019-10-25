@@ -54,8 +54,4 @@ void SpawnZombie::draw()
 	//cout << "Temp Pos " << temppos << endl;
 
 }
-void SpawnZombie::FollowPalm(float posx, float posy)
-{
-	collisionbox.setPosition(posx, posy);
-	collisionbox.setVelocity(0, 0);
-}
+

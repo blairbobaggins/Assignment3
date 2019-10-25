@@ -24,8 +24,6 @@ void ofApp::setup()
 	handcollisionbox.setPhysics(10.0, 0.1, 1.5);
 	handcollisionbox.setup(box2d.getWorld(), 400, 500, 91.5f, 152.0f, 0.0f);
 	
-	
-
 	ofAddListener(box2d.contactStartEvents, this, &ofApp::contactStart);
 	ofAddListener(box2d.contactEndEvents, this, &ofApp::contactEnd);
 	//ofAddListener(handcheck.pinchStrength(), this, ofApp::contactStart);
@@ -73,19 +71,12 @@ void ofApp::update()
 		//cout << hand.palmVelocity() << endl;
 		if (followpalm)
 		{
-			
-			//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
-			//zombie.world.grabShapeDown(m_palmPos.x, m_palmPos.z, 1);
+			m_joint.setup(box2d.getWorld(), handcollisionbox.body, zombie.collisionbox.body, 4.0f, 0.5f, false);
 			
 		}
-		else if (letgo)
+		else if (letgo && m_pinchstrength <= 0.75)
 		{
-			//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
-			
-			//zombie.world.grabShapeDragged(hand.palmVelocity().x, hand.palmVelocity().z, 1);
-			//zombie.world.grabShapeUp(hand.palmVelocity().x, hand.palmVelocity().z, 1);
-			//handcollisionbox.setVelocity(0,0);
-			//zombie.collisionbox.setVelocity(hand.palmVelocity());
+			m_joint.destroy();
 		}
         break; // if you only
     }
@@ -93,7 +84,6 @@ void ofApp::update()
 	if (m_pinchstrength >= 0.75)
 	{
 		handcollisionbox.setPosition(m_palmPos.x, m_palmPos.z);
-		//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
 		
 	}
 	else
@@ -104,9 +94,6 @@ void ofApp::update()
 	
 	cout << handcollisionbox.getVelocity() << endl;
     zombie.update();
-    //zombie2.update();
-
-
 }
 
 //--------------------------------------------------------------
@@ -122,7 +109,6 @@ void ofApp::draw()
     ofPopMatrix();
 	handcollisionbox.draw();
     zombie.draw();
-    //zombie2.draw();
 
 }
 
@@ -139,8 +125,6 @@ void ofApp::contactStart(ofxBox2dContactArgs &e)
 		{
 			followpalm = true;
 			letgo = false;
-			//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
-			//collisionbox.destroy();
 		}
 	}
 }
@@ -151,7 +135,7 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e)
 		if (followpalm && !letgo)
 		{
 			followpalm = false;
-			letgo = true;
+			letgo = true;			
 		}
 		
 	}

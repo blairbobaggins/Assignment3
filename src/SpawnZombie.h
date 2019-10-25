@@ -10,7 +10,7 @@ public:
     void setup(const ofxBox2d &worldref);
     void update();
     void draw();
-	void FollowPalm(float posx, float posy);
+
 
 	ofxBox2dRect collisionbox;
 

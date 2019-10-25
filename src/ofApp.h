@@ -16,12 +16,14 @@ public:
 	void contactEnd(ofxBox2dContactArgs &e);
 
     SpawnZombie zombie;
-    SpawnZombie zombie2;
+
+	ofVec2f Positionsetup;
 
 	bool followpalm;
 	bool letgo;
 
 	ofxBox2dRect handcollisionbox;
+
 
 
     ofxLeapC::Device            m_device;

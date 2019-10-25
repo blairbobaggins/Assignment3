@@ -27,6 +27,8 @@ void ofApp::setup()
 	handcollisionbox.setPhysics(10.0, 0.1, 1.5);
 	handcollisionbox.setup(box2d.getWorld(), 400, 500, 91.5f, 152.0f, 0.0f);
 	
+	
+
 	ofAddListener(box2d.contactStartEvents, this, &ofApp::contactStart);
 	ofAddListener(box2d.contactEndEvents, this, &ofApp::contactEnd);
 	//ofAddListener(handcheck.pinchStrength(), this, ofApp::contactStart);
@@ -74,12 +76,19 @@ void ofApp::update()
 		//cout << hand.palmVelocity() << endl;
 		if (followpalm)
 		{
-			m_joint.setup(box2d.getWorld(), handcollisionbox.body, zombie.collisionbox.body, 4.0f, 0.5f, false);
+			
+			//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
+			//zombie.world.grabShapeDown(m_palmPos.x, m_palmPos.z, 1);
 			
 		}
-		else if (letgo && m_pinchstrength <= 0.75)
+		else if (letgo)
 		{
-			m_joint.destroy();
+			//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
+			
+			//zombie.world.grabShapeDragged(hand.palmVelocity().x, hand.palmVelocity().z, 1);
+			//zombie.world.grabShapeUp(hand.palmVelocity().x, hand.palmVelocity().z, 1);
+			//handcollisionbox.setVelocity(0,0);
+			//zombie.collisionbox.setVelocity(hand.palmVelocity());
 		}
         break; // if you only
     }
@@ -87,6 +96,7 @@ void ofApp::update()
 	if (m_pinchstrength >= 0.75)
 	{
 		handcollisionbox.setPosition(m_palmPos.x, m_palmPos.z);
+		//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
 		
 	}
 	else
@@ -96,6 +106,9 @@ void ofApp::update()
 
 	cout << handcollisionbox.getVelocity() << endl;
     zombie.update();
+    //zombie2.update();
+
+
 }
 
 //--------------------------------------------------------------
@@ -111,6 +124,11 @@ void ofApp::draw()
     ofPopMatrix();
 	handcollisionbox.draw();
     zombie.draw();
+<<<<<<< HEAD
+=======
+    //zombie2.draw();
+
+>>>>>>> parent of f59dcf2... Grab and toss zombie working
 }
 
 void ofApp::OnLeapFrame(Leap::Frame frame)
@@ -126,6 +144,8 @@ void ofApp::contactStart(ofxBox2dContactArgs &e)
 		{
 			followpalm = true;
 			letgo = false;
+			//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
+			//collisionbox.destroy();
 		}
 		else if (e.a->GetType() == b2Shape::e_polygon && e.b->GetType() == b2Shape::e_edge ||
 			e.a->GetType() == b2Shape::e_edge && e.b->GetType() == b2Shape::e_polygon)
@@ -141,7 +161,7 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e)
 		if (followpalm && !letgo)
 		{
 			followpalm = false;
-			letgo = true;			
+			letgo = true;
 		}
 		
 	}

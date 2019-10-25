@@ -10,7 +10,7 @@ public:
     void setup(const ofxBox2d &worldref);
     void update();
     void draw();
-
+	float Lerp(float start, float end, float percent);
 
 	ofxBox2dRect collisionbox;
 

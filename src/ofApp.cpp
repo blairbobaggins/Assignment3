@@ -124,14 +124,10 @@ void ofApp::draw()
     ofPopMatrix();
 	handcollisionbox.draw();
     zombie.draw();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> parent of f59dcf2... Grab and toss zombie working
+
     //zombie2.draw();
 
->>>>>>> parent of f59dcf2... Grab and toss zombie working
+
 }
 
 void ofApp::OnLeapFrame(Leap::Frame frame)
@@ -149,14 +145,12 @@ void ofApp::contactStart(ofxBox2dContactArgs &e)
 			letgo = false;
 			//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
 			//collisionbox.destroy();
-<<<<<<< HEAD
+
 		}
 		else if (e.a->GetType() == b2Shape::e_polygon && e.b->GetType() == b2Shape::e_edge ||
 			e.a->GetType() == b2Shape::e_edge && e.b->GetType() == b2Shape::e_polygon)
 		{
 			cout << "stuff" << endl;
-=======
->>>>>>> parent of f59dcf2... Grab and toss zombie working
 		}
 	}
 }

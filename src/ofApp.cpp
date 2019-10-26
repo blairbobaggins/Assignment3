@@ -15,12 +15,9 @@ void ofApp::setup()
     box2d.init();
 	box2d.enableEvents();
     box2d.setGravity(0.1, 0);
-	//box2d.createGround();
+	box2d.createGround();
 	box2d.setFPS(60.0);
 	box2d.registerGrabbing();
-	box2d.createBounds(0, 0, ProjectConstants::PROJ_WINDOW_RES_X, ProjectConstants::PROJ_WINDOW_RES_Y);
-	
-	
 
     zombie.setup(box2d);
  
@@ -104,6 +101,7 @@ void ofApp::update()
 		handcollisionbox.setPosition(-1000,-1000);
 	}
 
+	
 	cout << handcollisionbox.getVelocity() << endl;
     zombie.update();
     //zombie2.update();
@@ -125,9 +123,12 @@ void ofApp::draw()
 	handcollisionbox.draw();
     zombie.draw();
 
+<<<<<<< HEAD
     //zombie2.draw();
 
 
+=======
+>>>>>>> parent of ad795b7... Collision with ground
 }
 
 void ofApp::OnLeapFrame(Leap::Frame frame)
@@ -146,11 +147,6 @@ void ofApp::contactStart(ofxBox2dContactArgs &e)
 			//zombie.FollowPalm(m_palmPos.x, m_palmPos.z);
 			//collisionbox.destroy();
 
-		}
-		else if (e.a->GetType() == b2Shape::e_polygon && e.b->GetType() == b2Shape::e_edge ||
-			e.a->GetType() == b2Shape::e_edge && e.b->GetType() == b2Shape::e_polygon)
-		{
-			cout << "stuff" << endl;
 		}
 	}
 }

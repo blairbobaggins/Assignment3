@@ -20,9 +20,11 @@ void ofApp::setup()
 	box2d.registerGrabbing();
 	box2d.createBounds(0, 0, ProjectConstants::PROJ_WINDOW_RES_X, ProjectConstants::PROJ_WINDOW_RES_Y);
 	
-	
-
-    zombie.setup(box2d);
+	for (int i = 0; i < 2; i++)
+	{
+		zombie[i].setup(box2d);
+	}
+    
  
 	handcollisionbox.setPhysics(10.0, 0.1, 1.5);
 	handcollisionbox.setup(box2d.getWorld(), 400, 500, 91.5f, 152.0f, 0.0f);
@@ -74,15 +76,15 @@ void ofApp::update()
 		//cout << hand.palmVelocity() << endl;
 		if (followpalm)
 		{
-			m_joint.setup(box2d.getWorld(), handcollisionbox.body, zombie.collisionbox.body, 1.0f, 0.5f, false);
+			m_joint.setup(box2d.getWorld(), handcollisionbox.body, zombie->collisionbox.body, 1.0f, 0.5f, false);
 			m_joint.setLength(0);
-			zombie.isgrabbed = true;
-			
+			zombie->isgrabbed = true;
+		
 		}
 		else if (letgo && m_pinchstrength <= 0.75)
 		{
 			m_joint.destroy();
-			zombie.isgrabbed = false;
+			//zombie->isgrabbed = false;
 		}
         break; // if you only
     }
@@ -94,11 +96,15 @@ void ofApp::update()
 	}
 	else
 	{
-		handcollisionbox.setPosition(-1000,-1000);
+		//handcollisionbox.destroy();
 	}
 
 	//cout << handcollisionbox.getVelocity() << endl;
-    zombie.update();
+	for (int i = 0; i < 2; i++)
+	{
+		zombie[i].update();
+	}
+    
 }
 
 //--------------------------------------------------------------
@@ -114,7 +120,11 @@ void ofApp::draw()
     ofPopMatrix();
 	handcollisionbox.draw();
 
-    zombie.draw();
+	for (int i = 0; i < 2; i++)
+	{
+		zombie[i].draw();
+	}
+    
 	m_joint.draw();
 }
 
@@ -129,6 +139,7 @@ void ofApp::contactStart(ofxBox2dContactArgs &e)
 		if (e.a->GetType() == b2Shape::e_polygon && e.b->GetType() == b2Shape::e_polygon &&
 			m_pinchstrength >= 0.75)
 		{
+			
 			followpalm = true;
 			letgo = false;
 		}
@@ -136,7 +147,6 @@ void ofApp::contactStart(ofxBox2dContactArgs &e)
 			e.a->GetType() == b2Shape::e_edge && e.b->GetType() == b2Shape::e_polygon)
 		{
 			cout << "stuff" << endl;
-			//zombie.unload();
 		}
 	}
 }

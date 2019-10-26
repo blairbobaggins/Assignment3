@@ -15,7 +15,7 @@ public:
 	void contactStart(ofxBox2dContactArgs &e);
 	void contactEnd(ofxBox2dContactArgs &e);
 
-    SpawnZombie zombie;
+    SpawnZombie zombie[2];
 
 	ofVec2f Positionsetup;
 

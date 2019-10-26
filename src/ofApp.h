@@ -30,14 +30,13 @@ public:
     Leap::Frame                 m_frame;
 
     void OnLeapFrame(Leap::Frame frame); // this is where Leap updates all Leap data.
-
-	ofxBox2dJoint				m_joint;	//joint between ship and zombie
+	ofxBox2dJoint				m_joint;
     ofImage                     m_ship;
     ofVec3f                     m_palmPos;
     ofVec3f                     m_palmRot;
     float                       m_pinchstrength;
     float                       m_grabstrength;
-    float						m_fingers;
+    float m_fingers;
 
 
     //box2d setup

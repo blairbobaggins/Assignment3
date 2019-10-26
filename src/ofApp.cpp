@@ -75,11 +75,14 @@ void ofApp::update()
 		if (followpalm)
 		{
 			m_joint.setup(box2d.getWorld(), handcollisionbox.body, zombie.collisionbox.body, 1.0f, 0.5f, false);
+			m_joint.setLength(0);
+			zombie.isgrabbed = true;
 			
 		}
 		else if (letgo && m_pinchstrength <= 0.75)
 		{
 			m_joint.destroy();
+			zombie.isgrabbed = false;
 		}
         break; // if you only
     }
@@ -110,7 +113,9 @@ void ofApp::draw()
 		
     ofPopMatrix();
 	handcollisionbox.draw();
+
     zombie.draw();
+	m_joint.draw();
 }
 
 void ofApp::OnLeapFrame(Leap::Frame frame)
@@ -131,6 +136,7 @@ void ofApp::contactStart(ofxBox2dContactArgs &e)
 			e.a->GetType() == b2Shape::e_edge && e.b->GetType() == b2Shape::e_polygon)
 		{
 			cout << "stuff" << endl;
+			//zombie.unload();
 		}
 	}
 }

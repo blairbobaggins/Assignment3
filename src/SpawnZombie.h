@@ -10,11 +10,14 @@ public:
     void setup(const ofxBox2d &worldref);
     void update();
     void draw();
-	void FollowPalm(float posx, float posy);
 
+	float Lerp(float start, float end, float percent);
 	ofxBox2dRect collisionbox;
 
 	ofxBox2d world;
+
+	bool isgrabbed;
+
 private:
     ofImage m_ZombieImage;
     ofVec2f m_ZombiePos;

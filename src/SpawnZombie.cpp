@@ -54,8 +54,12 @@ void SpawnZombie::draw()
 	//cout << "Temp Pos " << temppos << endl;
 
 }
+<<<<<<< HEAD
 void SpawnZombie::FollowPalm(float posx, float posy)
 {
 	collisionbox.setPosition(posx, posy);
 	collisionbox.setVelocity(0, 0);
 }
+=======
+
+>>>>>>> parent of 7de690d... zombie lerping to a destination

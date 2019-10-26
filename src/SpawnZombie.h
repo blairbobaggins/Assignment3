@@ -10,7 +10,11 @@ public:
     void setup(const ofxBox2d &worldref);
     void update();
     void draw();
+<<<<<<< HEAD
 	void FollowPalm(float posx, float posy);
+=======
+
+>>>>>>> parent of 7de690d... zombie lerping to a destination
 
 	ofxBox2dRect collisionbox;
 

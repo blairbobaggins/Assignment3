@@ -123,12 +123,11 @@ void ofApp::draw()
 	handcollisionbox.draw();
     zombie.draw();
 
-<<<<<<< HEAD
+
     //zombie2.draw();
 
 
-=======
->>>>>>> parent of ad795b7... Collision with ground
+
 }
 
 void ofApp::OnLeapFrame(Leap::Frame frame)

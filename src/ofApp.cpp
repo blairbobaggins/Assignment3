@@ -74,7 +74,7 @@ void ofApp::update()
 		//cout << hand.palmVelocity() << endl;
 		if (followpalm)
 		{
-			m_joint.setup(box2d.getWorld(), handcollisionbox.body, zombie.collisionbox.body, 4.0f, 0.5f, false);
+			m_joint.setup(box2d.getWorld(), handcollisionbox.body, zombie.collisionbox.body, 1.0f, 0.5f, false);
 			
 		}
 		else if (letgo && m_pinchstrength <= 0.75)
@@ -94,7 +94,7 @@ void ofApp::update()
 		handcollisionbox.setPosition(-1000,-1000);
 	}
 
-	cout << handcollisionbox.getVelocity() << endl;
+	//cout << handcollisionbox.getVelocity() << endl;
     zombie.update();
 }
 

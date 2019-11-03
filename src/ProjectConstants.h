@@ -10,6 +10,6 @@ namespace ProjectConstants
     static const float PROJ_DESIRED_FRAMERATE = 60.0f;
 
     //asset consts
-    static const string IMG_PATH_SHIP = "images/ship.png";
+    static const string IMG_PATH_SHIP = "images/neutral.png";
 
 }

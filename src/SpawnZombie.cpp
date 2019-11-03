@@ -9,57 +9,89 @@ SpawnZombie::~SpawnZombie()
 {
 
 }
+//sets up the zombies image
 void SpawnZombie::setup(const ofxBox2d &worldref)
 {
-    m_ZombieImage.loadImage("Images/zombie2.png");
+	//loads the image of the zombie
+    m_ZombieImage.loadImage("Images/zombie.png");
+	//sets the zombies position
     m_ZombiePos.set(100, ofRandom(100, 500));
-    
-
-	//collisionchecker = false;
-
-
-
+	//initializes the cooldown timer
+	cooldowntimer = 0;
+	
+	//saves a copy of the world for initializing collision boxes
     world = worldref;
 
 
 
-    //temppos = world.toB2d(m_ZombiePos.x, m_ZombiePos.y);
+    //creates the zombies collision box
 	collisionbox.setPhysics(3.0, 0.1, 1.5);
-    collisionbox.setup(world.getWorld(), 400, 500, 91.5f, 152.0f, 0.0f);
-	endpoint.set(1000, 720);
+    collisionbox.setup(world.getWorld(), 100, ofRandom(100, 500), 91.5f, 152.0f, 0.0f);
+	endpoint.set(1000, 1000);
 	
 
 }
 
 void SpawnZombie::update()
 {
-    ofVec2f ZombieToEnd = endpoint - collisionbox.getPosition();
-
-
-	
-	collisionbox.update();
-	collisionbox.setRotation(0);
-	m_ZombieImage.resize(collisionbox.getWidth(), collisionbox.getHeight());
-
-	if (!isgrabbed)
+	//if the zombie is not dead, update the collision box and keep the image on the zombie
+	if (!isdead)
 	{
-		collisionbox.setPosition(Lerp(collisionbox.getPosition().x, ZombieToEnd.x, 0.009f),
-			Lerp(collisionbox.getPosition().y, ZombieToEnd.y, 0.009f));
+		collisionbox.update();
+		collisionbox.setRotation(0);
+		m_ZombieImage.resize(collisionbox.getWidth(), collisionbox.getHeight());
 	}
-
-	//cout << collisionbox.getVelocity() << endl;
+	//if the zombie is dead, move the collision box off screen and wait for respond
+	if (isdead)
+	{
+		m_ZombieImage.resize(collisionbox.getWidth(), collisionbox.getHeight());
+		collisionbox.setPosition(-1000, -1000);
+	}
+	//respawn timer
+	if (cooldowntimer > 0)
+	{
+		cooldowntimer--;
+	}
+	//when the respawn timer is done, respawn the zombie
+	else if (cooldowntimer <= 0 && isdead)
+	{
+		isdead = false;
+		collisionbox.setPosition(ofRandom(100, 500), ofRandom(100, 500));
+		collisionbox.setVelocity(0, 0);
+		SwapSprite();
+	}
 }
 void SpawnZombie::draw()
 {
-	collisionbox.draw();
-    ofPushMatrix();
-		ofTranslate(collisionbox.getPosition());
-		m_ZombieImage.draw(0,0);
-    ofPopMatrix();
-	//cout << "Temp Pos " << temppos << endl;
+	//collisionbox.draw();
+	//if the zombie is alive, move the image with the collision box
+	if (!isdead)
+	{
+		ofPushMatrix();
+			ofTranslate(collisionbox.getPosition());
+			m_ZombieImage.draw(0, 0);
+		ofPopMatrix();
+	}
+	//if the zombie is dead, draw the zombie at the place it died and wait to respawn
+	if (isdead)
+	{
+		ofPushMatrix();
 
+			m_ZombieImage.draw(tempx, tempy);
+		ofPopMatrix();
+	}
 }
-float SpawnZombie::Lerp(float start, float end, float percent)
+//swaps a sprite depending on if the zombie is alive or dead
+void SpawnZombie::SwapSprite()
 {
-	return(start + percent * (end - start));
+	tempx = collisionbox.getPosition().x;
+	tempy = collisionbox.getPosition().y;
+	if (isdead)
+	{
+		m_ZombieImage.loadImage("Images/Empty.png");
+	}
+	if (!isdead)
+	{
+		m_ZombieImage.loadImage("Images/zombie.png");
+	}
 }

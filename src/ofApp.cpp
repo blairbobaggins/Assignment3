@@ -4,7 +4,8 @@
 void ofApp::setup()
 {
     //initiate program
-    m_ship.load(ProjectConstants::IMG_PATH_SHIP);
+	m_hand.load(ProjectConstants::IMG_PATH_SHIP);
+	
     ofSetRectMode(OF_RECTMODE_CENTER); // center pivot point on all images.
     //setup window
     ofSetWindowShape(ProjectConstants::PROJ_WINDOW_RES_X, ProjectConstants::PROJ_WINDOW_RES_Y);
@@ -12,26 +13,31 @@ void ofApp::setup()
     m_device.connectEventHandler(&ofApp::OnLeapFrame, this);
 	Leap::Hand handcheck;
 
+
+	//Initialing the box2d world
     box2d.init();
 	box2d.enableEvents();
     box2d.setGravity(0.1, 0);
-	//box2d.createGround();
 	box2d.setFPS(60.0);
 	box2d.registerGrabbing();
 	box2d.createBounds(0, 0, ProjectConstants::PROJ_WINDOW_RES_X, ProjectConstants::PROJ_WINDOW_RES_Y);
 	
-	for (int i = 0; i < 2; i++)
-	{
-		zombie[i].setup(box2d);
-	}
-    
- 
-	handcollisionbox.setPhysics(10.0, 0.1, 1.5);
-	handcollisionbox.setup(box2d.getWorld(), 400, 500, 91.5f, 152.0f, 0.0f);
+	//seting up the zombie
+	zombie.setup(box2d);
+
+	//initializing the score
+	score = 0;
+
+	//initializing the checks to see if the collision boxes have been created
+	pinchcollisionboxcreated = false;
+	grabcollisionboxcreated = false;
+
 	
+	
+
+	//initializing the collision listener events
 	ofAddListener(box2d.contactStartEvents, this, &ofApp::contactStart);
 	ofAddListener(box2d.contactEndEvents, this, &ofApp::contactEnd);
-	//ofAddListener(handcheck.pinchStrength(), this, ofApp::contactStart);
 	followpalm = false;
 	letgo = false;
 }
@@ -39,6 +45,7 @@ void ofApp::setup()
 //--------------------------------------------------------------
 void ofApp::update()
 {
+	//updates the box2d world
     box2d.update();
 
     m_device.update(); //update Leap device.
@@ -58,11 +65,11 @@ void ofApp::update()
             ofRadToDeg(hand.direction().roll()); // rotate z
         m_palmPos = ofPalmPos;
 
-        //cout << hand.pinchStrength() << endl;
+        //saves the pinch/grab strength to a variable
         m_pinchstrength = hand.pinchStrength();
         m_grabstrength = hand.grabStrength();
 
-        //m_fingers = hand.fingers().fingerType(LEAP_VE
+        
         //find some scaling that works to get across the screen
         m_palmPos.x *= 7.0f;
         m_palmPos.z *= 5.0f;
@@ -73,59 +80,110 @@ void ofApp::update()
         m_palmPos.x += (float)ProjectConstants::PROJ_WINDOW_RES_X / 2.0f;
         m_palmPos.z += (float)ProjectConstants::PROJ_WINDOW_RES_Y / 2.0f;
 
-		//cout << hand.palmVelocity() << endl;
-		if (followpalm)
+		//checks to see if followpalm is turned on. Checks to see if the zombie is suppose to follow the hand
+		if (followpalm )
 		{
-			m_joint.setup(box2d.getWorld(), handcollisionbox.body, zombie->collisionbox.body, 1.0f, 0.5f, false);
-			m_joint.setLength(0);
-			zombie->isgrabbed = true;
+			//creates a joint between the pinch collision box and the zombies body
+			m_joint.setup(box2d.getWorld(), pinchcollisioncircle.body, zombie.collisionbox.body, 1.0f, 0.5f, false);
+			m_joint.setLength(5);
+			zombie.isgrabbed = true;
 		
 		}
-		else if (letgo && m_pinchstrength <= 0.75)
+		//checks to see if the pinch/grab strength are less than a threshold to destroy the joint
+		else if (letgo && m_pinchstrength <= 0.75 && m_grabstrength <= 0.75)
 		{
-			m_joint.destroy();
-			//zombie->isgrabbed = false;
+			//makes sure the joint is alive before destroying it
+			if (!m_joint.joint)
+			{
+				//destroys the join
+				m_joint.destroy();
+				zombie.isgrabbed = false;
+			}
+			
 		}
-        break; // if you only
+        break; // if you only have 3 hands
     }
-	handcollisionbox.setRotation(0);
-	if (m_pinchstrength >= 0.75)
+	
+	//if the pinch strength is a certain threshold, create a collisionbox that follows the palms position
+	if (m_pinchstrength >= 0.75 && m_grabstrength <= 0.20)
 	{
-		handcollisionbox.setPosition(m_palmPos.x, m_palmPos.z);
-		
+		//makes sure the collision box isn't created, if it isn't create one, then no more
+		if (!pinchcollisionboxcreated)
+		{
+			pinchcollisioncircle.setPhysics(10.0, 0.1, 1.5);
+			pinchcollisioncircle.setup(box2d.getWorld(), 400, 500, 50, false);
+			pinchcollisionboxcreated = true;
+			m_hand.loadImage("Images/pinch.png");
+
+		}
+		//the collisionbox always follows the palms position
+		pinchcollisioncircle.setRotation(0);
+		pinchcollisioncircle.setPosition(m_palmPos.x, m_palmPos.z);
+	}
+	//checks the grab strength, if it's over a certain threshold, create a collision box
+	else if (m_grabstrength >= 0.90&& m_pinchstrength <= 0.20)
+	{
+		//makes sure the collision box isn't created, if it isn't create one, then no more
+		if (!grabcollisionboxcreated)
+		{
+			GrabcollisionBox.setPhysics(10.0, 5.0, 1.5);
+			GrabcollisionBox.setup(box2d.getWorld(), 0, 0, 200, 200, false);
+			grabcollisionboxcreated = true;
+			m_hand.loadImage("Images/fist.png");
+		}
+		//the collisionbox always follows the palms position
+		GrabcollisionBox.setPosition(m_palmPos.x, m_palmPos.z);
+
 	}
 	else
 	{
-		//handcollisionbox.destroy();
+		//if grab or pinch strength is below a threshold and either box has been created, destroy the box. If they aren't created
+		//ignore. also swaps the hand sprites to neutral
+		if (grabcollisionboxcreated)
+		{
+			GrabcollisionBox.destroy();
+			grabcollisionboxcreated = false;
+			m_hand.loadImage("Images/neutral.png");
+		}
+		
+		if (pinchcollisionboxcreated)
+		{
+			pinchcollisioncircle.destroy();
+			pinchcollisionboxcreated = false;
+			m_hand.loadImage("Images/neutral.png");
+		}
+		zombie.isgrabbed = false;
+		followpalm = false;
+		letgo = true;
+		
 	}
-
-	//cout << handcollisionbox.getVelocity() << endl;
-	for (int i = 0; i < 2; i++)
-	{
-		zombie[i].update();
-	}
-    
+	//update the zombie
+	zombie.update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-   // ofClear(ofFloatColor(m_grabstrength, 0.0f, 0.0f));
+	//draw the score
+	ofPushMatrix();
+		ofSetColor(0, 0, 0);
+		ofDrawRectangle(10, 300, 150, 80);
+		ofSetColor(255, 255, 255);
+		ofDrawBitmapString("Score: " + ofToString(score), 10, 300);
+	ofPopMatrix();
+	//draw the hand
     ofPushMatrix();
         ofTranslate(m_palmPos.x, m_palmPos.z);
         ofRotateDeg(m_palmRot.y);
-        ofScale(m_pinchstrength + 0.5f, m_pinchstrength + 0.5f, m_pinchstrength + 0.5f);
-        m_ship.draw(0, 0);
-		
+		ofScale(0.5);
+		m_hand.draw(0, 0);
     ofPopMatrix();
-	handcollisionbox.draw();
-
-	for (int i = 0; i < 2; i++)
-	{
-		zombie[i].draw();
-	}
+	
+	//pinchcollisioncircle.draw();
+	//GrabcollisionBox.draw();
+	//draw the zombie
+	zombie.draw();
     
-	m_joint.draw();
 }
 
 void ofApp::OnLeapFrame(Leap::Frame frame)
@@ -134,26 +192,46 @@ void ofApp::OnLeapFrame(Leap::Frame frame)
 }
 void ofApp::contactStart(ofxBox2dContactArgs &e)
 {
+	//makes sure both objects that collided are not null
 	if (e.a != NULL && e.b != NULL)
 	{
-		if (e.a->GetType() == b2Shape::e_polygon && e.b->GetType() == b2Shape::e_polygon &&
+		//checks to see if the zombie collided with the palm. The zombie being the polygon and the palm being the circle
+		if (e.a->GetType() == b2Shape::e_polygon && e.b->GetType() == b2Shape::e_circle &&
 			m_pinchstrength >= 0.75)
 		{
-			
 			followpalm = true;
 			letgo = false;
 		}
-		else if (e.a->GetType() == b2Shape::e_polygon && e.b->GetType() == b2Shape::e_edge ||
-			e.a->GetType() == b2Shape::e_edge && e.b->GetType() == b2Shape::e_polygon)
+		//checks to see if the zombie collides witht he grab, or fist
+		else if (e.a->GetType() == b2Shape::e_polygon && e.b->GetType() == b2Shape::e_polygon &&
+			letgo, !zombie.isdead, !zombie.isgrabbed && m_grabstrength >= 0.75)
 		{
-			cout << "stuff" << endl;
+			//can sometimes cause a null ref if the leap motion jitters and stops detecting the hand.I'm unsure as to how we'd
+			//go about fixing it
+			if (!GrabcollisionBox.body)
+			{
+				zombie.collisionbox.addRepulsionForce(GrabcollisionBox.getVelocity(), 100.0f);
+			}
 		}
+		//checks to see if the zombies collides with an edge and it's not being held
+		if (e.a->GetType() == b2Shape::e_edge && e.b->GetType() == b2Shape::e_polygon &&
+			letgo && !zombie.isdead  && m_pinchstrength <= 0.75)
+		{
+			//makes the zombie "dead" 
+			zombie.isgrabbed = false;
+			score++;
+			zombie.isdead = true;
+			zombie.SwapSprite();
+			zombie.cooldowntimer = 100;
+		}
+		
 	}
 }
 void ofApp::contactEnd(ofxBox2dContactArgs &e)
 {
 	if (e.a != NULL && e.b != NULL)
 	{
+		//when the zombie stops colliding with the pinch, do this
 		if (followpalm && !letgo)
 		{
 			followpalm = false;

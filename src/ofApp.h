@@ -15,15 +15,20 @@ public:
 	void contactStart(ofxBox2dContactArgs &e);
 	void contactEnd(ofxBox2dContactArgs &e);
 
-    SpawnZombie zombie[2];
+    SpawnZombie zombie;
 
 	ofVec2f Positionsetup;
 
 	bool followpalm;
 	bool letgo;
 
-	ofxBox2dRect handcollisionbox;
+	bool pinchcollisionboxcreated;
+	bool grabcollisionboxcreated;
 
+	ofxBox2dCircle pinchcollisioncircle;
+	ofxBox2dRect GrabcollisionBox;
+
+	int score;
 
 
     ofxLeapC::Device            m_device;
@@ -31,7 +36,7 @@ public:
 
     void OnLeapFrame(Leap::Frame frame); // this is where Leap updates all Leap data.
 	ofxBox2dJoint				m_joint;
-    ofImage                     m_ship;
+    ofImage                     m_hand;
     ofVec3f                     m_palmPos;
     ofVec3f                     m_palmRot;
     float                       m_pinchstrength;
